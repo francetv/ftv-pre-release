@@ -1,9 +1,16 @@
 var RSVP = require('rsvp'),
     ProgressBar = require('progress'),
-    inquirer = require("inquirer");
+    inquirer = require("inquirer"),
+    ProgressBar = require('progress');
 
 var Version = require('./models/Version'),
-    file = require('./file');
+    file = require('./file'),
+    git = require('./git'),
+    bar = new ProgressBar(':bar', {
+        total: 100
+    });
+
+
 
 module.exports = {
     bump: function(mode) {
@@ -42,15 +49,20 @@ module.exports = {
             })
             // Create a version object
             .then(function(currentVersion) {
+                bar.tick(20);
                 version = new Version(currentVersion);
             })
             // Incremente version number depending on the mode
             .then(function() {
+                bar.tick(20);
                 version.increment(mode);
             })
+            // Ask for confirmation
             .then(function() {
+                bar.tick(20);
                 var deferred = RSVP.defer();
 
+                process.stdout.write('\n');
                 inquirer.prompt([{
                     type: 'confirm',
                     name: 'newVersion',
@@ -65,6 +77,29 @@ module.exports = {
                 });
 
                 return deferred.promise;
+            })
+            // Check for unstaged or changed files
+            .then(function() {
+                bar.tick(20);
+
+                return git.exec('diff', ['--exit-code'])
+                    .then(function() {
+                        return git.exec('diff', ['--cached', '--exit-code']);
+                    })
+                    .catch(function(error) {
+                        var stepError = new Error('GIT - Please, commit your changes or stash them first');
+                        throw stepError;
+                    });
+            })
+            // Commit the prepare release commit
+            .then(function() {
+                bar.tick(20);
+
+                return git.exec('commit', ['-m', '"Prepare release ' + version.toString() + '"'])
+                    .catch(function(error) {
+                        var stepError = new Error('GIT - failed exec the prepare release commit');
+                        throw stepError;
+                    });
             })
             // Catch all errors
             .catch(function(error) {
