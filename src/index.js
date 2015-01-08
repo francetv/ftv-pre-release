@@ -7,7 +7,7 @@ var Version = require('./models/Version'),
     file = require('./file'),
     git = require('./git'),
     bar = new ProgressBar(':bar', {
-        total: 100
+        total: 60
     });
 
 
@@ -49,17 +49,17 @@ module.exports = {
             })
             // Create a version object
             .then(function(currentVersion) {
-                bar.tick(20);
+                bar.tick(10);
                 version = new Version(currentVersion);
             })
             // Incremente version number depending on the mode
             .then(function() {
-                bar.tick(20);
+                bar.tick(10);
                 version.increment(mode);
             })
             // Ask for confirmation
             .then(function() {
-                bar.tick(20);
+                bar.tick(10);
                 var deferred = RSVP.defer();
 
                 process.stdout.write('\n');
@@ -78,9 +78,17 @@ module.exports = {
 
                 return deferred.promise;
             })
+            // Write version files
+            .then(function() {
+                bar.tick(10);
+
+                return file.write(['package.json', 'bower.json'], {
+                    version: version.toString()
+                });
+            })
             // Check for unstaged or changed files
             .then(function() {
-                bar.tick(20);
+                bar.tick(10);
 
                 return git.exec('diff', ['--exit-code'])
                     .then(function() {
@@ -93,7 +101,7 @@ module.exports = {
             })
             // Commit the prepare release commit
             .then(function() {
-                bar.tick(20);
+                bar.tick(10);
 
                 return git.exec('commit', ['-m', '"Prepare release ' + version.toString() + '"'])
                     .catch(function(error) {
