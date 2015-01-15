@@ -78,14 +78,6 @@ module.exports = {
 
                 return deferred.promise;
             })
-            // Write version files
-            .then(function() {
-                bar.tick(10);
-
-                return file.write(['package.json', 'bower.json'], {
-                    version: version.toString()
-                });
-            })
             // Check for unstaged or changed files
             .then(function() {
                 bar.tick(10);
@@ -99,11 +91,19 @@ module.exports = {
                         throw stepError;
                     });
             })
+            // Write version files
+            .then(function() {
+                bar.tick(10);
+
+                return file.write(['package.json', 'bower.json'], {
+                    version: version.toString()
+                });
+            })
             // Commit the prepare release commit
             .then(function() {
                 bar.tick(10);
 
-                return git.exec('commit', ['-m', '"Prepare release ' + version.toString() + '"'])
+                return git.exec('commit', ['-am', '"Prepare release ' + version.toString() + '"'])
                     .catch(function(error) {
                         var stepError = new Error('GIT - failed exec the prepare release commit');
                         throw stepError;
