@@ -109,6 +109,10 @@ module.exports = {
                         throw stepError;
                     });
             })
+            // Notify the success
+            .then(function() {
+                process.stdout.write('\n\nSuccessfully make a pre-release for the version ' + version.toString() + '\n');
+            })
             // Catch all errors
             .catch(function(error) {
                 process.stdout.write('\n\nERROR ' + error.message + ' ' + (error.parent ? "(" + error.parent.message + ")" : '') + '\n');
