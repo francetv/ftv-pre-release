@@ -13,13 +13,13 @@
   "license": "ISC",
   "dependencies": {
     "commander": "^2.3.0",
-    "ftv-release": "^1.0.1",
     "git-wrapper": "^0.1.1",
     "inquirer": "^0.8.0",
     "progress": "^1.1.8",
     "rsvp": "^3.0.14"
   },
   "devDependencies": {
-    "ftv-mergeup": "*"
+    "ftv-mergeup": "*",
+    "ftv-release": "*"
   }
 }
