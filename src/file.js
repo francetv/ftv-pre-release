@@ -39,7 +39,7 @@ module.exports = {
                     if (exists) {
                         var fileContent = extend(require(baseDir + '/' + name), attributes);
 
-                        fs.writeFile(baseDir + '/' + name, JSON.stringify(fileContent), function(err) {
+                        fs.writeFile(baseDir + '/' + name, JSON.stringify(fileContent, null, 2), function(err) {
                             if (err) {
                                 return reject(new Error('Failed wirting new attributes in ' + name + ' file'));
                             }
